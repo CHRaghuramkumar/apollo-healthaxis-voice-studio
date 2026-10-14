@@ -1,0 +1,10 @@
+{
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node",
+      "config": { "includeFiles": ["index.html", "admin.html", "app.js", "drag.js", "logo.webp", "data/use-cases.json"] }
+    }
+  ],
+  "routes": [{ "src": "/(.*)", "dest": "/server.js" }]
+}

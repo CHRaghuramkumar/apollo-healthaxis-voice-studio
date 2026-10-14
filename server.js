@@ -45,7 +45,7 @@ const MIME = {
 let cache = null;
 let queue = Promise.resolve();
 
-const server = http.createServer(async (req, res) => {
+async function handle(req, res) {
   try {
     const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
     if (url.pathname.startsWith('/api/')) {
@@ -80,9 +80,11 @@ const server = http.createServer(async (req, res) => {
     if (status >= 500) console.error(err);
     sendJson(res, status, { error: status >= 500 ? 'Something went wrong.' : err.message });
   }
-});
+}
 
-server.listen(PORT, () => {
+module.exports = handle;
+
+if (require.main === module) http.createServer(handle).listen(PORT, () => {
   const password = Boolean(process.env.ADMIN_PASSWORD);
   const key = Boolean(apiKey());
   console.log(`Apollo HealthAxis Voice Studio`);
