@@ -1,36 +1,46 @@
 # Apollo HealthAxis · Voice AI Studio
 
-A client-facing demo of Apollo HealthAxis AI voice agents for healthcare. It plays scripted live calls, with voice, for six use cases:
+A client-facing demo of Apollo HealthAxis voice agents. Use cases on the main page come from a password-protected admin. Each use case can be chatted with in the browser through a live [ElevenLabs](https://elevenlabs.io) agent.
 
-- Appointment booking and rescheduling
-- Appointment reminders and cancellations
-- ProHealth check-up reminders
-- No-show follow-up
-- Post-discharge care and feedback
-- Patient support with human handoff
+## Run
 
-**Live:** https://apollo-healthaxis-voice-studio.vercel.app
+```bash
+cp .env.example .env
+```
+
+Set `ADMIN_PASSWORD` and `ELEVENLABS_API_KEY` in `.env`, then:
+
+```bash
+npm start
+```
+
+Open http://localhost:8000. Manage use cases at http://localhost:8000/admin.
+
+The API key stays on the server. The browser only receives a short-lived ElevenLabs session for the agent you attached to a use case.
+
+## Admin
+
+Sign in and add:
+
+- **Title:** the card heading
+- **Direction:** Inbound or Outbound
+- **Use cases:** one or more filters, such as Appointment booking or Cancellations
+- **Description:** the summary under the title
+- **Agent ID:** the ElevenLabs agent, for example `agent_abc123`
+
+The main page has the same Direction and Use case dropdowns. Pick a filter, then start the agent that remains.
+
+Saving updates the list the main page loads. The order in the admin is the order visitors see.
+
+In ElevenLabs, the agent needs to allow browser conversations. A private agent works: this server requests the WebRTC token (voice) or signed URL (text) with the API key.
 
 ## Files
 
 | File | What it does |
 |---|---|
-| `index.html` | Page layout and styles |
-| `app.js` | Use cases, call scripts, 19-language voice preview, ask bar, live call player |
-| `drag.js` | Drag-to-reorder for the use-case cards |
-| `logo.webp` | Apollo HealthAxis logo |
-
-There is no build step. It is a static site, so open `index.html` in a browser or deploy the folder as-is.
-
-## Run locally
-
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
-
-## Notes
-
-- Audio uses the browser's built-in speech voices. Chrome or Edge sound best, and Edge has the widest set of Indian-language voices.
-- Full sample calls play in English. Other languages play the agent's opening line only.
-- All patient names, UHIDs and phone numbers are fictional demo data.
+| `server.js` | Serves the site, the admin API, and ElevenLabs session tokens |
+| `data/use-cases.json` | The use cases. Agent IDs live here and are not sent to the public page |
+| `admin.html` | Password-protected editor |
+| `index.html` | The studio page |
+| `app.js` | Loads use cases and runs live chat with `@elevenlabs/client` |
+| `drag.js` | Drag-to-reorder for the use-case cards in this browser |

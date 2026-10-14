@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Use cases · Apollo HealthAxis Voice Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b2530;--muted:#5d6f78;--navy:#02475b;--blue:#0087ba;--line:#e1e8f0;--soft:#f5f8fc;--alert:#c0392b;--ok:#1a8a5a;--font:"IBM Plex Sans",Inter,ui-sans-serif,system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);color:var(--ink);background:radial-gradient(ellipse at 50% 0,#e3f2f6 0,transparent 42%),#fff}
+a{color:var(--blue)}
+.wrap{max-width:920px;margin:auto;padding:28px 20px 64px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:28px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit}
+.brand img{height:42px;width:auto}
+.brand span{font-size:12px;font-weight:650;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:32px;letter-spacing:-.03em;margin:0 0 8px;color:var(--navy)}
+.lead{margin:0 0 18px;color:var(--muted);line-height:1.5}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px;box-shadow:0 16px 50px #02475b10}
+label{display:block;font-size:12px;font-weight:700;margin:14px 0 6px}
+input,textarea,select{width:100%;border:1px solid var(--line);border-radius:12px;padding:11px 13px;font:inherit;color:var(--ink);outline-color:var(--blue);background:#fff}
+textarea{min-height:96px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+button{font:inherit;cursor:pointer}
+.btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-weight:650;color:var(--ink)}
+.btn:hover{border-color:#8cc6db}
+.btn.main{background:#fc9916;border-color:#fc9916;color:#1f2a30}
+.btn.main:hover{background:#e8850a}
+.btn.danger{color:var(--alert)}
+.btn:disabled{opacity:.45;cursor:default}
+.note{font-size:13px;color:var(--muted);line-height:1.5;margin:12px 0 0}
+.choices{display:flex;flex-wrap:wrap;gap:8px}
+.choices label{display:flex;align-items:center;gap:6px;margin:0;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:999px;padding:8px 12px;cursor:pointer}
+.choices input{width:auto;margin:0;accent-color:#0087ba}
+.warn{background:#fff6e8;border:1px solid #f3d7a1;color:#8a5a10;border-radius:12px;padding:10px 12px;font-size:13px;margin-bottom:14px}
+.err{color:var(--alert);font-size:13px;min-height:18px;margin:10px 0 0}
+.ok{color:var(--ok);font-size:13px;min-height:18px;margin:10px 0 0}
+.list{display:grid;gap:10px;margin-top:22px}
+.item{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+.item.editing{border-color:var(--blue);box-shadow:0 0 0 2px #0087ba1a}
+.item b{display:block;font-size:15px}
+.item p{margin:6px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.meta span{font-size:11px;font-weight:650;color:#30507a;background:#e6f4f8;border-radius:999px;padding:4px 8px}
+.item .actions{margin-top:12px}
+.gate{max-width:440px;margin:12vh auto}
+@media(max-width:700px){.row{grid-template-columns:1fr}h1{font-size:28px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="/"><img src="logo.webp" alt="Apollo HealthAxis"><span>Voice AI Studio</span></a>
+    <button class="btn" id="logoutBtn" type="button" hidden>Sign out</button>
+  </header>
+
+  <section class="card gate" id="gate">
+    <h1>Use case admin</h1>
+    <p class="lead">Sign in to add the agent and the copy that fill the main page.</p>
+    <form id="loginForm">
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" required>
+      <div class="actions"><button class="btn main" type="submit">Sign in</button></div>
+      <div class="err" id="loginErr" role="alert"></div>
+    </form>
+  </section>
+
+  <section id="app" hidden>
+    <h1>Use cases</h1>
+    <p class="lead">Each saved use case appears on the main page. The agent ID stays on the server. Visitors chat with that ElevenLabs agent in the browser.</p>
+    <div class="warn" id="keyWarn" hidden>The ElevenLabs API key is not set on the server, so live chat cannot start until <code>ELEVENLABS_API_KEY</code> is configured.</div>
+    <form class="card" id="editor">
+      <div class="row">
+        <div>
+          <label for="title">Title</label>
+          <input id="title" name="title" required maxlength="140" placeholder="Appointment booking">
+        </div>
+        <div>
+          <label for="direction">Direction</label>
+          <select id="direction" required></select>
+        </div>
+      </div>
+      <label>Use cases</label>
+      <div class="choices" id="categories"></div>
+      <label for="description">Description</label>
+      <textarea id="description" name="description" required maxlength="800" placeholder="What this agent does for the hospital and the patient."></textarea>
+      <label for="agentId">Agent ID</label>
+      <input id="agentId" name="agentId" maxlength="80" placeholder="agent_…" autocomplete="off" spellcheck="false">
+      <div class="actions">
+        <button class="btn main" id="saveBtn" type="submit">Add use case</button>
+        <button class="btn" id="cancelBtn" type="button" hidden>Cancel edit</button>
+      </div>
+      <div class="err" id="formErr" role="alert"></div>
+      <p class="ok" id="formOk" role="status"></p>
+      <p class="note">Order here is what every visitor sees. Dragging cards on the main page only reorders them in that browser.</p>
+    </form>
+    <div class="list" id="list"></div>
+  </section>
+</div>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let editing = null;
+  let items = [];
+  let catalog = { directions: [], categories: [] };
+
+  async function api(path, opts) {
+    const res = await fetch(path, {
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      ...opts
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+
+  function field(name) { return $(name).value.trim(); }
+
+  function directionLabel(id) {
+    const found = catalog.directions.find(d => d.id === id);
+    return found ? found.label : id;
+  }
+  function categoryLabel(id) {
+    const found = catalog.categories.find(c => c.id === id);
+    return found ? found.label : id;
+  }
+  function buildCatalog(filters) {
+    catalog = filters || catalog;
+    const direction = $('direction');
+    const current = direction.value;
+    direction.replaceChildren();
+    catalog.directions.forEach(item => {
+      const option = document.createElement('option');
+      option.value = item.id;
+      option.textContent = item.label;
+      direction.append(option);
+    });
+    if (catalog.directions.some(item => item.id === current)) direction.value = current;
+    const box = $('categories');
+    box.replaceChildren();
+    catalog.categories.forEach(item => {
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = item.id;
+      label.append(input, document.createTextNode(item.label));
+      box.append(label);
+    });
+  }
+  function chosenCategories() {
+    return [...document.querySelectorAll('#categories input:checked')].map(input => input.value);
+  }
+
+  function fill(u) {
+    $('title').value = u ? u.title : '';
+    if (u && catalog.directions.some(item => item.id === u.direction)) $('direction').value = u.direction;
+    else if (catalog.directions[0]) $('direction').value = catalog.directions[0].id;
+    document.querySelectorAll('#categories input').forEach(input => {
+      input.checked = Boolean(u && (u.categories || []).includes(input.value));
+    });
+    $('description').value = u ? u.description : '';
+    $('agentId').value = u ? u.agentId : '';
+    editing = u ? u.id : null;
+    $('saveBtn').textContent = u ? 'Save changes' : 'Add use case';
+    $('cancelBtn').hidden = !u;
+    $('formErr').textContent = '';
+    $('formOk').textContent = '';
+    render();
+  }
+
+  function render() {
+    const list = $('list');
+    list.replaceChildren();
+    if (!items.length) {
+      const empty = document.createElement('p');
+      empty.className = 'note';
+      empty.textContent = 'No use cases yet. Add the first one above.';
+      list.append(empty);
+      return;
+    }
+    items.forEach((u, i) => {
+      const card = document.createElement('article');
+      card.className = 'item' + (u.id === editing ? ' editing' : '');
+      const title = document.createElement('b');
+      title.textContent = u.title;
+      const desc = document.createElement('p');
+      desc.textContent = u.description;
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      [directionLabel(u.direction), ...((u.categories || []).map(categoryLabel)), u.agentId || 'No agent ID'].forEach(text => {
+        const s = document.createElement('span');
+        s.textContent = text;
+        meta.append(s);
+      });
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      actions.append(
+        button('Edit', () => { fill(u); $('editor').scrollIntoView({ behavior: 'smooth', block: 'start' }); }),
+        button('Delete', () => remove(u), 'danger'),
+        button('Move up', () => move(i, -1), '', i === 0),
+        button('Move down', () => move(i, 1), '', i === items.length - 1)
+      );
+      card.append(title, desc, meta, actions);
+      list.append(card);
+    });
+  }
+
+  function button(label, onClick, kind, disabled) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn' + (kind ? ' ' + kind : '');
+    b.textContent = label;
+    b.disabled = Boolean(disabled);
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  async function load() {
+    const data = await api('/api/admin/use-cases');
+    buildCatalog(data.filters);
+    items = data.useCases || [];
+    render();
+  }
+
+  async function remove(u) {
+    if (!confirm(`Delete “${u.title}”? It will disappear from the main page.`)) return;
+    await api('/api/admin/use-cases/' + encodeURIComponent(u.id), { method: 'DELETE' });
+    if (editing === u.id) fill(null);
+    await load();
+  }
+
+  async function move(index, dir) {
+    const next = items.slice();
+    const j = index + dir;
+    if (j < 0 || j >= next.length) return;
+    const [row] = next.splice(index, 1);
+    next.splice(j, 0, row);
+    const data = await api('/api/admin/use-cases/reorder', {
+      method: 'POST',
+      body: JSON.stringify({ ids: next.map(u => u.id) })
+    });
+    items = data.useCases || next;
+    render();
+  }
+
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    $('loginErr').textContent = '';
+    try {
+      const data = await api('/api/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({ password: $('password').value })
+      });
+      $('password').value = '';
+      showApp(data.elevenlabs);
+      await load();
+    } catch (err) {
+      $('loginErr').textContent = err.message;
+    }
+  });
+
+  $('editor').addEventListener('submit', async e => {
+    e.preventDefault();
+    $('formErr').textContent = '';
+    $('formOk').textContent = '';
+    const categories = chosenCategories();
+    if (!categories.length) {
+      $('formErr').textContent = 'Choose at least one use case.';
+      return;
+    }
+    const body = {
+      title: field('title'),
+      direction: $('direction').value,
+      categories,
+      description: $('description').value.trim(),
+      agentId: field('agentId')
+    };
+    try {
+      if (editing) {
+        await api('/api/admin/use-cases/' + encodeURIComponent(editing), { method: 'PUT', body: JSON.stringify(body) });
+        $('formOk').textContent = 'Saved. The main page will show this on its next load.';
+      } else {
+        await api('/api/admin/use-cases', { method: 'POST', body: JSON.stringify(body) });
+        $('formOk').textContent = 'Added. It is now on the main page.';
+      }
+      fill(null);
+      await load();
+    } catch (err) {
+      $('formErr').textContent = err.message;
+    }
+  });
+
+  $('cancelBtn').addEventListener('click', () => fill(null));
+  $('logoutBtn').addEventListener('click', async () => {
+    await api('/api/admin/logout', { method: 'POST', body: '{}' });
+    items = [];
+    fill(null);
+    $('app').hidden = true;
+    $('logoutBtn').hidden = true;
+    $('gate').hidden = false;
+  });
+
+  function showApp(elevenlabs) {
+    $('gate').hidden = true;
+    $('app').hidden = false;
+    $('logoutBtn').hidden = false;
+    $('keyWarn').hidden = Boolean(elevenlabs);
+  }
+
+  api('/api/admin/session').then(async data => {
+    showApp(data.elevenlabs);
+    await load();
+  }).catch(() => {});
+})();
+</script>
+</body>
+</html>

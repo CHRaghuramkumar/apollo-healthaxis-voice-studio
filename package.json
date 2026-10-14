@@ -1,0 +1,10 @@
+{
+  "name": "apollo-healthaxis-voice-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Apollo HealthAxis voice studio with live ElevenLabs agent chat and a password-protected use-case admin.",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "ISC"
+}
