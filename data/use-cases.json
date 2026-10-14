@@ -1,0 +1,62 @@
+[
+  {
+    "id": "booking",
+    "title": "Appointment Booking & Rescheduling",
+    "direction": "inbound",
+    "categories": ["appointment-booking", "rescheduling"],
+    "description": "Book, reschedule or cancel by voice, 24×7, with live slots from MedMantra.",
+    "agentId": "",
+    "createdAt": "2026-10-14T00:00:00.000Z",
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  {
+    "id": "reminders",
+    "title": "Appointment Reminders & Cancellations",
+    "direction": "outbound",
+    "categories": ["reminders", "cancellations"],
+    "description": "Day-before reminders that confirm, reschedule or cancel — and refill freed slots.",
+    "agentId": "",
+    "createdAt": "2026-10-14T00:00:00.000Z",
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  {
+    "id": "prohealth",
+    "title": "ProHealth Check-up Reminders",
+    "direction": "outbound",
+    "categories": ["prohealth"],
+    "description": "Confirms attendance and shares fasting and preparation instructions in advance.",
+    "agentId": "",
+    "createdAt": "2026-10-14T00:00:00.000Z",
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  {
+    "id": "noshow",
+    "title": "No-Show Follow-up",
+    "direction": "outbound",
+    "categories": ["no-show"],
+    "description": "Calls patients who missed visits, captures the reason and rebooks on the spot.",
+    "agentId": "",
+    "createdAt": "2026-10-14T00:00:00.000Z",
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  {
+    "id": "engagement",
+    "title": "Post-Discharge Care & Feedback",
+    "direction": "outbound",
+    "categories": ["post-discharge"],
+    "description": "Day 1·3·7 care calls: medication check, red-flag screening and feedback.",
+    "agentId": "",
+    "createdAt": "2026-10-14T00:00:00.000Z",
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  {
+    "id": "support",
+    "title": "Patient Support & Human Handoff",
+    "direction": "inbound",
+    "categories": ["patient-support"],
+    "description": "Answers routine queries instantly and warm-transfers complex ones with full context.",
+    "agentId": "",
+    "createdAt": "2026-10-14T00:00:00.000Z",
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  }
+]
