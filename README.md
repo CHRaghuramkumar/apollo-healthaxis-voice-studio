@@ -22,11 +22,11 @@ The API key stays on the server. The browser only receives a short-lived ElevenL
 
 Sign in and add:
 
-- **Title** — the card heading
-- **Direction** — Inbound or Outbound
-- **Use cases** — one or more filters, such as Appointment booking or Cancellations
-- **Description** — the summary under the title
-- **Agent ID** — the ElevenLabs agent, for example `agent_abc123`
+- **Title:** the card heading
+- **Direction:** Inbound or Outbound
+- **Use cases:** one or more filters, such as Appointment booking or Cancellations
+- **Description:** the summary under the title
+- **Agent ID:** the ElevenLabs agent, for example `agent_abc123`
 
 The main page has the same Direction and Use case dropdowns. Pick a filter, then start the agent that remains.
 

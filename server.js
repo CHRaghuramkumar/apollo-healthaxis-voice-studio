@@ -88,8 +88,8 @@ server.listen(PORT, () => {
   console.log(`Apollo HealthAxis Voice Studio`);
   console.log(`  Site   http://localhost:${PORT}`);
   console.log(`  Admin  http://localhost:${PORT}/admin`);
-  console.log(`  Admin password: ${password ? 'configured' : 'NOT SET — set ADMIN_PASSWORD'}`);
-  console.log(`  ElevenLabs API key: ${key ? 'configured' : 'NOT SET — set ELEVENLABS_API_KEY'}`);
+  console.log(`  Admin password: ${password ? 'configured' : 'NOT SET. Set ADMIN_PASSWORD'}`);
+  console.log(`  ElevenLabs API key: ${key ? 'configured' : 'NOT SET. Set ELEVENLABS_API_KEY'}`);
 });
 
 async function handleApi(req, res, url) {

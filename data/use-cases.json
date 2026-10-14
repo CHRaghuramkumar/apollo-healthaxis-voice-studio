@@ -14,7 +14,7 @@
     "title": "Appointment Reminders & Cancellations",
     "direction": "outbound",
     "categories": ["reminders", "cancellations"],
-    "description": "Day-before reminders that confirm, reschedule or cancel — and refill freed slots.",
+    "description": "Day-before reminders that confirm, reschedule or cancel, and refill freed slots.",
     "agentId": "",
     "createdAt": "2026-10-14T00:00:00.000Z",
     "updatedAt": "2026-10-14T00:00:00.000Z"

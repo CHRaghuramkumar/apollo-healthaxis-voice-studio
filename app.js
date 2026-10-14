@@ -10,19 +10,24 @@
     users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.2a5 5 0 0 1 5 4.8"/>',
     check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
     gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
-    scale: '<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>'
+    scale: '<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',
+    audio: '<path d="M11 5L6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 6a8 8 0 0 1 0 12"/>',
+    moon: '<path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5z"/>'
   };
   const BENEFITS = [
-    ['users', 'Reduced manual effort', 'Reminder, follow-up and feedback calls run on the agent, freeing front-desk and call-centre staff for complex cases.'],
-    ['heart', 'Better patient engagement', 'Every patient can reach the agent in the browser, before visits and after discharge.'],
-    ['check', 'Higher appointment adherence', 'The same agent that reminds and reschedules is the one visitors talk to on this page.'],
-    ['gear', 'Operational efficiency', 'Each use case is tied to a live ElevenLabs agent and the hospital workflow it supports.'],
-    ['scale', 'Scales on demand', 'Add a use case in the admin and it shows up here, ready for a real conversation.']
+    ['users', 'Reduced manual effort', 'Reminder, follow-up and feedback calls are placed by the agent, so front-desk and call-centre staff stay on the cases that need a person.'],
+    ['heart', 'Better patient engagement', 'Patients can call the hospital, and the hospital can call them, before a visit and after discharge.'],
+    ['check', 'Higher appointment adherence', 'The agent phones to remind, confirm, reschedule or rebook, so more patients arrive for the slot they were given.'],
+    ['gear', 'Operational efficiency', 'Every call follows the hospital workflow: live slots, preparation instructions, and a recorded outcome for the front desk.'],
+    ['scale', 'Scales on demand', 'One agent can place and answer many patient calls at once, including peaks the call centre cannot staff.'],
+    ['audio', 'Handles background noise', 'On a ward, in traffic, or at home with noise around them, the agent still hears the patient and finishes the call.'],
+    ['moon', 'Answered after hours', 'Booking, reminders and follow-up calls continue after the front desk closes, including nights and weekends.'],
+    ['headset', 'Handoff with context', 'Routine phone calls stay with the agent. Complex ones transfer to staff with the conversation already in hand.']
   ];
   const STEPS = [
     'Use case selected',
     'Connected to the ElevenLabs agent',
-    'Speak or type — the agent replies live'
+    'Speak or type, and the agent replies live'
   ];
 
   let useCases = [];
@@ -158,7 +163,7 @@
   function setMode(label) {
     const el = $('#mood');
     el.className = 'mood' + (label === 'Listening' ? ' listening' : label === 'Speaking' || label === 'Typing' ? ' speaking' : '');
-    el.textContent = label && label !== '—' ? 'Agent · ' + label : 'Agent —';
+    el.textContent = label ? 'Agent · ' + label : 'Agent';
   }
 
   function renderTimer() {
@@ -270,7 +275,7 @@
         stopTimer();
         setWave(false);
         setLive(false, 'Ready');
-        setMode('—');
+        setMode('');
         updateControls();
         const agent = document.querySelector('.node[data-node="agent"]');
         if (agent) agent.classList.remove('ping');
@@ -369,7 +374,7 @@
     stopTimer();
     setWave(false);
     setLive(false, 'Ready');
-    setMode('—');
+    setMode('');
     const agent = document.querySelector('.node[data-node="agent"]');
     if (agent) agent.classList.remove('ping');
     updateControls();
@@ -590,11 +595,11 @@
     $('#valueTitle').textContent = 'What ' + u.title.toLowerCase() + ' delivers';
     const kpis = $('#kpis');
     kpis.replaceChildren(
-      kpi(u.chatEnabled ? 'Live' : '—', u.chatEnabled ? 'In-browser chat with this ElevenLabs agent' : 'Add an agent ID to enable live chat'),
-      kpi('Voice', 'Speak with the agent in the browser'),
-      kpi('24×7', categoryLabels(u.categories).join(' · ') || u.title)
+      kpi('Phone', 'Inbound and outbound calls with real patients'),
+      kpi('24×7', 'Answered and followed up around the clock'),
+      kpi('Care team', 'Staff take the calls that need a person. The agent handles the rest.')
     );
-    $('#archNote').textContent = `The “${u.title}” conversation runs on its ElevenLabs agent in the browser on this page.`;
+    $('#archNote').textContent = `Patient calls for ${u.title} run on this voice agent over the hospital phone lines.`;
     const liveNodes = new Set(['patient', 'telephony', 'agent']);
     document.querySelectorAll('.node').forEach(node => {
       const on = liveNodes.has(node.dataset.node);
@@ -639,6 +644,172 @@
       });
       ask.append(button);
     });
+  }
+
+  function mountHeroAura() {
+    const aura = document.querySelector('.hero-aura');
+    const canvas = document.getElementById('heroGraph');
+    if (!aura || !canvas) return;
+    const ctx = canvas.getContext('2d');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w = 1;
+    let h = 1;
+    let dpr = 1;
+    let radius = 38;
+    let mx = 0;
+    let my = 0;
+    let smx = 0;
+    let smy = 0;
+    let influence = 0;
+    let targetInf = 0;
+    let running = true;
+
+    function centimetre() {
+      const probe = document.createElement('div');
+      probe.style.cssText = 'position:absolute;width:1cm;height:0;overflow:hidden;pointer-events:none';
+      document.body.append(probe);
+      const px = probe.getBoundingClientRect().width || 37.8;
+      probe.remove();
+      return px;
+    }
+
+    function resize() {
+      const rect = aura.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.max(1, rect.width);
+      h = Math.max(1, rect.height);
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      radius = centimetre() * 3.6;
+    }
+
+    function warp(x, y) {
+      if (influence < 0.01) return [x, y];
+      const dx = x - smx;
+      const dy = y - smy;
+      const dist = Math.hypot(dx, dy);
+      if (dist >= radius) return [x, y];
+      const t = 1 - dist / radius;
+      const fall = t * t * (3 - 2 * t);
+      const scale = 1 + fall * influence * 1.15;
+      return [smx + dx * scale, smy + dy * scale];
+    }
+
+    function sampleY(x, time, amp, freq, phase) {
+      const u = (x / Math.max(w, 1)) * Math.PI * 2;
+      return Math.sin(u * freq + time + phase) * amp
+        + Math.sin(u * freq * 0.45 - time * 0.55 + phase) * amp * 0.4;
+    }
+
+    function poly(points, color, width) {
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    }
+
+    function guides(step, color, across) {
+      const pts = [];
+      if (across) {
+        for (let y = step; y < h; y += step) {
+          pts.length = 0;
+          for (let x = 0; x <= w; x += 12) pts.push(warp(x, y));
+          poly(pts, color, 1);
+        }
+      } else {
+        for (let x = step; x < w; x += step) {
+          pts.length = 0;
+          for (let y = 0; y <= h; y += 12) pts.push(warp(x, y));
+          poly(pts, color, 1);
+        }
+      }
+    }
+
+    function draw(now) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      guides(28, 'rgba(0,135,186,0.06)', true);
+      guides(48, 'rgba(2,71,91,0.045)', false);
+      const time = reduce ? 1.2 : now * 0.00028;
+      const count = Math.max(2, Math.ceil(w / 6));
+      const series = [
+        { y: 0.22, amp: 16, freq: 2.1, phase: 0.2, speed: 1, color: 'rgba(0,135,186,0.34)', width: 1.5, fill: 'rgba(0,135,186,0.05)', dots: 14 },
+        { y: 0.38, amp: 24, freq: 3.2, phase: 1.05, speed: 0.82, color: 'rgba(0,135,186,0.3)', width: 1.45, dots: 18 },
+        { y: 0.54, amp: 15, freq: 1.7, phase: 2.15, speed: 0.64, color: 'rgba(2,71,91,0.24)', width: 1.2, dots: 22 },
+        { y: 0.7, amp: 20, freq: 2.7, phase: 0.55, speed: 1.12, color: 'rgba(0,135,186,0.22)', width: 1.15, fill: 'rgba(0,135,186,0.035)', dots: 16 }
+      ];
+      series.forEach(line => {
+        const points = [];
+        for (let i = 0; i <= count; i++) {
+          const x = (i / count) * w;
+          const y = h * line.y + sampleY(x, time * line.speed, line.amp, line.freq, line.phase);
+          points.push(warp(x, y));
+        }
+        if (line.fill) {
+          ctx.beginPath();
+          ctx.moveTo(points[0][0], points[0][1] + 28);
+          points.forEach(p => ctx.lineTo(p[0], p[1]));
+          ctx.lineTo(points[points.length - 1][0], points[points.length - 1][1] + 28);
+          ctx.closePath();
+          ctx.fillStyle = line.fill;
+          ctx.fill();
+        }
+        poly(points, line.color, line.width);
+        if (line.dots) {
+          ctx.fillStyle = line.color;
+          for (let i = 6; i < points.length; i += line.dots) {
+            ctx.beginPath();
+            ctx.arc(points[i][0], points[i][1], 2.1, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      });
+    }
+
+    let looping = false;
+    function frame(now) {
+      if (!running || document.visibilityState === 'hidden') {
+        looping = false;
+        return;
+      }
+      smx += (mx - smx) * 0.14;
+      smy += (my - smy) * 0.14;
+      influence += (targetInf - influence) * 0.1;
+      draw(now);
+      requestAnimationFrame(frame);
+    }
+    function loop() {
+      if (looping) return;
+      looping = true;
+      requestAnimationFrame(frame);
+    }
+
+    resize();
+    window.addEventListener('resize', resize);
+    if (reduce) {
+      draw(0);
+      return;
+    }
+    window.addEventListener('pointermove', e => {
+      const rect = aura.getBoundingClientRect();
+      const inside = e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom;
+      targetInf = inside ? 1 : 0;
+      if (!inside) return;
+      mx = e.clientX - rect.left;
+      my = e.clientY - rect.top;
+      if (influence < 0.02) {
+        smx = mx;
+        smy = my;
+      }
+    });
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loop();
+    });
+    loop();
   }
 
   function renderBenefits() {
@@ -692,7 +863,7 @@
       renderFlow();
       setFlow(selected() ? 0 : -1);
       showChatError('');
-      setMode('—');
+      setMode('');
       seconds = 0;
       renderTimer();
       setLive(false, 'Ready');
@@ -844,6 +1015,8 @@
       loadUseCases({ preserve: true }).catch(() => {});
     }
   });
+
+  mountHeroAura();
 
   loadUseCases().catch(err => {
     const grid = $('#ucGrid');
